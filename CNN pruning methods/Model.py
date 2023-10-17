@@ -16,7 +16,7 @@ from Logger import Logger as log
 class EvoPruningModel(object):
     def __init__(self, train_generator, test_generator, info,
                  pruneFC1=True, pruneFC2=True, final_sparsity=0.9,
-                 batch_size=32, epochs=600):
+                 batch_size=32, epochs=2):
         self.batch_size = batch_size
         self.epochs = epochs
         self.traingen = train_generator
@@ -70,13 +70,16 @@ class EvoPruningModel(object):
         self.raw_model = tf.keras.models.clone_model(self.model_to_prune)
         self.raw_model.set_weights(self.model_to_prune.get_weights())
         self.raw_model_weights = self.raw_model.get_weights()
-        opt = SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
+        opt = tf.keras.optimizers.SGD(learning_rate=1e-3, momentum=0.9, nesterov=True)
+
+
         self.raw_model.compile(
             optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
         log.DebugSuccess('Raw model compiled')
 
     def _compile(self):
-        opt = SGD(lr=1e-3, decay=1e-6, momentum=0.9, nesterov=True)
+        opt = tf.keras.optimizers.SGD(learning_rate=1e-3, momentum=0.9, nesterov=True)
+
         self.model.compile(
             optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
         log.DebugSuccess('Model compiled')
